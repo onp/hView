@@ -37,7 +37,7 @@
 
   tRef.orderBy('time','desc').limit(1).get().then(function(qs) {
     var d = qs.docs[0].data()
-    console.log(d));
+    console.log(d);
 
     ct.textContent = '';
     var elDate = document.createElement('p');
