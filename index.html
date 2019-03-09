@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Is it cold?">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hView</title>
+</head>
+
+<body>
+<h1>hView</h1>
+<div id=content>
+  <p>Waiting for data...</p>
+
+
+
+
+<script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  firebase.initializeApp({
+    apiKey: "AIzaSyCch8gDaGfQhOFVroFCZHKosa3oOU-WvPE",
+    authDomain: "templogger-233703.firebaseapp.com",
+    projectId: "templogger-233703",
+  });
+  var db = firebase.firestore(config);
+</script>
+
+<script>
+  //get last datapoint
+  var tRef = db.collection("temperatures");
+
+  tRef.orderBy('time','desc').limit(1).then(function(d) {
+    console.log(d.data());
+  })
+
+</body>
+</html>
