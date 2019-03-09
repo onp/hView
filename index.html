@@ -30,12 +30,33 @@
 </script>
 
 <script>
+  //ref for content node
+  var ct = document.querySelector('#content')
   //get last datapoint
   var tRef = db.collection("temperatures");
 
-  tRef.orderBy('time','desc').limit(1).then(function(d) {
-    console.log(d.data());
+  tRef.orderBy('time','desc').limit(1).get().then(function(qs) {
+    var d = qs.docs[0].data()
+    console.log(d));
+
+    ct.textContent = '';
+    var elDate = document.createElement('p');
+    elDate.textContent = d.time.toDate()
+
+    var elTemperature = document.createElement('p');
+    elTemperature.textContent = "Temperature: " + d.temp + " C"
+
+    var elHumidity = document.createElement('p');
+    elHumidity.textContent = "humidity: " + d.humidity + "%"
+
+
+    ct.appendChild(elDate)
+    ct.appendChild(elTemperature)
+    ct.appendChild(elHumidity)
+
   })
+
+</script>
 
 </body>
 </html>
