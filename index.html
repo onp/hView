@@ -43,6 +43,7 @@
       elTd.textContent = el
       elTr.appendChild(elTr)
     })
+    return elTr
   }
 
   tRef.orderBy('time','desc').limit(11).get().then(function(qs) {
