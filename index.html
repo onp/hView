@@ -35,24 +35,47 @@
   //get last datapoint
   var tRef = db.collection("temperatures");
 
-  tRef.orderBy('time','desc').limit(1).get().then(function(qs) {
-    var d = qs.docs[0].data()
-    console.log(d);
+  function tableRow(elems) {
+    var elTr = document.createElement('tr')
+    var elTd = undefined
+    elems.forEach(function(el){
+      elTd = document.createElement('td')
+      elTd.textContent = el
+      elTr.appendChild(elTr)
+    })
+  }
+
+  tRef.orderBy('time','desc').limit(11).get().then(function(qs) {
+    var d1 = qs.docs[0].data()
+    console.log(d1);
 
     ct.textContent = '';
     var elDate = document.createElement('p');
-    elDate.textContent = d.time.toDate()
+    elDate.textContent = d1.time.toDate()
 
     var elTemperature = document.createElement('p');
-    elTemperature.textContent = "Temperature: " + d.temp + " C"
+    elTemperature.textContent = "Temperature: " + d1.temp + " C"
 
     var elHumidity = document.createElement('p');
-    elHumidity.textContent = "humidity: " + d.humidity + "%"
-
-
+    elHumidity.textContent = "Humidity: " + d1.humidity + "%"
     ct.appendChild(elDate)
     ct.appendChild(elTemperature)
     ct.appendChild(elHumidity)
+
+    var elTable = document.createElement('table')
+    ct.appendChild(elTable)
+    var elThead = document.createElement('thead')
+    elTable.appendChild(elThead)
+    elThead.appendChild(tableRow(['Time', 'Temperature', 'Humidity']))
+    qs.forEach(function(d){
+      elTable.appendChild(tableRow([d.time.toDate().toLocaleTimeString(),
+                                    d.temp,
+                                    d.humidity
+      ]))
+    })
+
+
+
 
   })
 
