@@ -68,7 +68,8 @@
     var elThead = document.createElement('thead')
     elTable.appendChild(elThead)
     elThead.appendChild(tableRow(['Time', 'Temperature', 'Humidity']))
-    qs.forEach(function(d){
+    qs.forEach(function(doc){
+      var d = doc.data()
       elTable.appendChild(tableRow([d.time.toDate().toLocaleTimeString(),
                                     d.temp,
                                     d.humidity
