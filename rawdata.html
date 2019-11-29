@@ -46,7 +46,7 @@
   todayStr = "2019-11-28"
 
   //get last datapoint
-  var doc = db.collection("tempDaily").document(todayStr);
+  var doc = db.collection("tempDaily").doc(todayStr);
   doc.get().then(function(qs) {
     var d1 = qs.data()
 
