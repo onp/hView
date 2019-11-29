@@ -1,0 +1,63 @@
+<!doctype html>
+
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Is it cold?">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hView</title>
+
+  <style>
+  td {
+    border: 1px solid black;
+    width: 6em;
+    text-align: center;
+  }
+  </style>
+
+</head>
+
+<body>
+<h1>hView</h1>
+<div id=content>
+  <p>Waiting for data...</p>
+
+
+
+
+<script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+<script>
+  // Initialize Firebase
+  firebase.initializeApp({
+    apiKey: "AIzaSyCch8gDaGfQhOFVroFCZHKosa3oOU-WvPE",
+    authDomain: "templogger-233703.firebaseapp.com",
+    projectId: "templogger-233703",
+  });
+  var db = firebase.firestore();
+</script>
+
+<script>
+  //ref for content node
+  var ct = document.querySelector('#content')
+  var today = new Date()
+  var todayStr = m.getFullYear() + '-' + (m.getMonth()+1) + "-" + (m.getDate())
+  todayStr = "2019-11-28"
+
+  //get last datapoint
+  var doc = db.collection("tempDaily").document(todayStr);
+  doc.get().then(function(qs) {
+    var d1 = qs.data()
+
+    ct.textContent = d1.data;
+
+
+
+
+  })
+
+</script>
+
+</body>
+</html>
