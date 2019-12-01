@@ -86,8 +86,8 @@
                   .domain(d3.extent(d, d => d.temp))
                   .range([h, 0]);
 
-    console.log(x.domain)
-    console.log(y1.domain)
+    console.log(x.domain())
+    console.log(y1.domain())
     var line = d3.line()
                 .x(d => x(d.date))
                 .y(d => y1(d.temp))
