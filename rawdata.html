@@ -63,7 +63,7 @@
   function makePlot(data){
     var d = d3.csvParse("date,humidity,temp\n" + data, d3.autoType)
 
-    var svg = d3.select("#content").append("svg")
+    var svg = d3.select("#content").text("").append("svg")
 
     svg.attr("width", w + m[1] + m[3])
        .attr("height", h + m[0] + m[2])
@@ -88,7 +88,7 @@
         .attr("class", "axis")
         .attr("transform", "translate(0," + h + ")")
         .call(d3.axisBottom(x))
-        .attr("transform", "translate(0," + y(0) + ")");
+        .attr("transform", "translate(0," + y1(0) + ")");
 
     // Add foreground lines.
     foreground = svg.append("svg:g")
