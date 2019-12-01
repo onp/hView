@@ -88,16 +88,27 @@
                   .domain(d3.extent(d, d => d.temp))
                   .range([h, 0]);
 
+    var y2 = d3.scaleLinear()
+                  .domain(d3.extent(d, d => d.humidity))
+                  .range([h, 0]);
+
     console.log(x.domain())
     console.log(y1.domain())
 
-    var line = d3.line()
+    var lineTemp = d3.line()
                 .x(d => x(d.date))
                 .y(d => y1(d.temp))
+
+    var lineHum = d3.line()
+                .x(d => x(d.date))
+                .y2(d => y2(d.humidity))
 
     plt.append("g")
         .attr("class", "axis")
         .call(d3.axisLeft(y1));
+    plt.append("g")
+        .attr("class", "axis")
+        .call(d3.axisRight(y2));
     plt.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(0," + h + ")")
@@ -105,13 +116,19 @@
         //.attr("transform", "translate(0," + y1(0) + ")");
 
     // Add lines.
-    plt.append("svg:g")
-        .append("path")
+    datalines = plt.append("svg:g")
+    datalines.append("path")
           .datum(d)
-          .attr("d", line(d))
+          .attr("d", lineTemp(d))
+          .attr("stroke", "red")
+          .attr("stroke-width", 1.5);
+          .attr("fill", "none")
+    datalines.append("path")
+          .datum(d)
+          .attr("d", lineHum(d))
           .attr("stroke", "blue")
           .attr("stroke-width", 1.5);
-
+          .attr("fill", "none")
   }
 
 
