@@ -61,7 +61,7 @@
   })
 
   function makePlot(data){
-    var d = d3.csvparse("date,humidity,temp\n" + data, d3.autoType)
+    var d = d3.csvParse("date,humidity,temp\n" + data, d3.autoType)
 
     d3.select("#content").selectAll("p").data(d)
       .enter().append("p")
