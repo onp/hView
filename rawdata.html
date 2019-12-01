@@ -63,6 +63,8 @@
   function makePlot(data){
     var d = d3.csvParse("date,humidity,temp\n" + data, d3.autoType)
 
+    console.log(d)
+
     var svg = d3.select("#content").text("").append("svg")
 
     svg.attr("width", w + m[1] + m[3])
@@ -77,9 +79,11 @@
                   .domain(d3.extent(d, d => d.temp))
                   .range([h, 0]);
 
+    console.log(x.domain)
+    console.log(y1.domain)
     var line = d3.line()
                 .x(d => x(d.date))
-                .y(d => y(d.val))
+                .y(d => y1(d.temp))
 
     svg.append("g")
         .attr("class", "axis")
