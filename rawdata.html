@@ -46,7 +46,7 @@
   todayStr = "2019-11-28"
 
   // setup margins for plot area
-  var m = [80, 160, 100, 160],
+  var m = [80, 80, 100, 80],
     w = window.innerWidth - m[1] - m[3],
     h = window.innerHeight - m[0] - m[2];
 
@@ -76,8 +76,9 @@
 
     svg.attr("width", w + m[1] + m[3])
        .attr("height", h + m[0] + m[2])
-       .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
+    var plt = svg.append("g")
+             .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
     var x = d3.scaleTime()
                   .domain(d3.extent(d, d => d.date))
@@ -93,17 +94,17 @@
                 .x(d => x(d.date))
                 .y(d => y1(d.temp))
 
-    svg.append("g")
+    plt.append("g")
         .attr("class", "axis")
         .call(d3.axisLeft(y1));
-    svg.append("g")
+    plt.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(0," + h + ")")
         .call(d3.axisBottom(x))
         //.attr("transform", "translate(0," + y1(0) + ")");
 
     // Add foreground lines.
-    foreground = svg.append("svg:g")
+    foreground = plt.append("svg:g")
         .selectAll("path")
           .data(d)
         .enter().append("svg:path")
