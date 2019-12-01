@@ -55,7 +55,7 @@
   doc.get().then(function(qs) {
     var d1 = qs.data()
 
-    ct.textContent = d1.data;
+    //ct.textContent = d1.data;
     makePlot(d1.data)
 
   })
@@ -63,9 +63,40 @@
   function makePlot(data){
     var d = d3.csvParse("date,humidity,temp\n" + data, d3.autoType)
 
-    d3.select("#content").selectAll("p").data(d)
-      .enter().append("p")
-        .text(d => String(d))
+    var svg = d3.select("#content").append("svg")
+
+    svg.attr("width", w + m[1] + m[3])
+       .attr("height", h + m[0] + m[2])
+
+
+    var x = d3.scaleTime()
+                  .domain(d3.extent(d, d => d.date))
+                  .range([0, w]);
+
+    var y1 = d3.scaleLinear()
+                  .domain(d3.extent(d, d => d.temp))
+                  .range([h, 0]);
+
+    var line = d3.line()
+                .x(d => x(d.date))
+                .y(d => y(d.val))
+
+    svg.append("g")
+        .attr("class", "axis")
+        .call(d3.axisLeft(y1));
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + h + ")")
+        .call(d3.axisBottom(x))
+        .attr("transform", "translate(0," + y(0) + ")");
+
+    // Add foreground lines.
+    foreground = svg.append("svg:g")
+        .selectAll("path")
+          .data(d)
+        .enter().append("svg:path")
+          .attr("d", d => line(d))
+          .attr("stroke", "blue";
 
   }
 
