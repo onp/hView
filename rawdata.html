@@ -61,7 +61,12 @@
   })
 
   function makePlot(data){
-    var d = d3.csvParse("date,humidity,temp\n" + data, d3.autoType)
+    var d = d3.csvParse("date,humidity,temp\n" + data,
+                        //d3.autoType
+                      d => {date: new Date(d.date.slice(1,-1)),
+                            humidity: d.humidity,
+                            temp: d.temp
+                      })
 
     console.log(d)
 
