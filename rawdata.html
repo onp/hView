@@ -104,7 +104,7 @@ position: relative;
 
     var lineHum = d3.line()
                 .x(d => x(d.date))
-                .y2(d => y2(d.humidity))
+                .y(d => y2(d.humidity))
 
     plt.append("g")
         .attr("class", "axis")
