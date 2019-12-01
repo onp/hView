@@ -22,12 +22,12 @@
 <h1>hView</h1>
 <div id=content>
   <p>Waiting for data...</p>
-
-
+</div>
 
 
 <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+<script src="lib/d3.js"></script>
 <script>
   // Initialize Firebase
   firebase.initializeApp({
@@ -45,17 +45,30 @@
   var todayStr = today.getFullYear() + '-' + (today.getMonth()+1) + "-" + (today.getDate())
   todayStr = "2019-11-28"
 
-  //get last datapoint
+  // setup margins for plot area
+  var m = [80, 160, 100, 160],
+    w = window.innerWidth - m[1] - m[3],
+    h = window.innerHeight - m[0] - m[2];
+
+  //get temp data for current day
   var doc = db.collection("tempDaily").doc(todayStr);
   doc.get().then(function(qs) {
     var d1 = qs.data()
 
     ct.textContent = d1.data;
-
-
-
+    makePlot(d1.data)
 
   })
+
+  function makePlot(data){
+    var d = d3.csvparse("date,humidity,temp\n" + data, d3.autoType)
+
+    d3.select("#content").selectAll("p").data(d)
+      .enter().append("p")
+        .text(d => String(d))
+
+  }
+
 
 </script>
 
