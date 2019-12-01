@@ -74,7 +74,7 @@
 
     var svg = d3.select("#content").text("").append("svg")
 
-    svg.attr("width", w + m[1] + m[3])
+    svg.attr("width", w + m[1] + m[3] - 1)
        .attr("height", h + m[0] + m[2])
 
     var plt = svg.append("g")
@@ -90,6 +90,7 @@
 
     console.log(x.domain())
     console.log(y1.domain())
+
     var line = d3.line()
                 .x(d => x(d.date))
                 .y(d => y1(d.temp))
@@ -103,13 +104,13 @@
         .call(d3.axisBottom(x))
         //.attr("transform", "translate(0," + y1(0) + ")");
 
-    // Add foreground lines.
-    foreground = plt.append("svg:g")
-        .selectAll("path")
-          .data(d)
-        .enter().append("svg:path")
-          .attr("d", d => line(d))
-          .attr("stroke", "blue");
+    // Add lines.
+    plt.append("svg:g")
+        .append("path")
+          .datum(d)
+          .attr("d", line(d))
+          .attr("stroke", "blue")
+          .attr("stroke-width", 1.5);
 
   }
 
