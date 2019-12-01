@@ -112,6 +112,7 @@ position: relative;
     plt.append("g")
         .attr("class", "axis")
         .call(d3.axisRight(y2));
+        .attr("transform", "translate("+ w + ",0)")
     plt.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(0," + h + ")")
