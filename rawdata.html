@@ -17,15 +17,21 @@ position: relative;
 
 }
 
+h1 a{
+  color:black;
+  text-decoration: none;
+}
+
   </style>
 
 </head>
 
 <body>
-<h1>hView</h1>
+<h1><a href="/">hView</a></h1>
 <div id=content>
   <p>Waiting for data...</p>
 </div>
+<label>Date</label><input type="date" id="startDate"></input>
 
 
 <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
@@ -42,23 +48,31 @@ position: relative;
 </script>
 
 <script>
-  //ref for content node
-  var ct = document.querySelector('#content')
-  var today = new Date()
-  var todayStr = today.getFullYear() + '-' + (today.getMonth()+1) + "-" + (today.getDate())
-  // todayStr = "2019-11-28"
 
-  // setup margins for plot area
-  var m = [80, 80, 100, 80],
+  function pad(num){
+    return num.toString().padStart(2,0)
+  }
+
+  //ref for date input
+  var dt = document.querySelector('#startDate')
+
+  var today = new Date()
+  var todayStr = today.getFullYear() + '-' + pad(today.getMonth()+1) + "-" + pad(today.getDate())
+
+  dt.value = todayStr
+
+  topOfContent = d3.select("#content").node().offsetTop
+  // setup margins for plot area      t, r, b, l
+  var m = [10, 80, 80, 80],
     w = window.innerWidth - m[1] - m[3],
-    h = window.innerHeight - m[0] - m[2];
+    h = window.innerHeight - m[0] - m[2] - topOfContent;
 
   //get temp data for current day
   var doc = db.collection("tempDaily").doc(todayStr);
   doc.get().then(function(qs) {
+    console.log(qs)
     var d1 = qs.data()
 
-    //ct.textContent = d1.data;
     makePlot(d1.data)
 
   })
@@ -68,11 +82,11 @@ position: relative;
                         //d3.autoType
                       function(d){
                         return {date: new Date(d.date.slice(1,-1)),
-                                humidity: d.humidity,
-                                temp: d.temp
+                                humidity: +d.humidity,
+                                temp: +d.temp
                                }
                       })
-
+    d = d.filter(d => !isNaN(d.humidity))
     console.log(d)
 
     var svg = d3.select("#content").text("").append("svg")
