@@ -85,7 +85,6 @@ h1 a{
 
   function makePlot(data){
     var d = d3.csvParse("date,temp,humidity\n" + data,
-                        //d3.autoType
                       function(d){
                         return {date: new Date(d.date.slice(1,-1)),
                                 humidity: +d.humidity,
@@ -102,6 +101,11 @@ h1 a{
 
     var plt = svg.append("g")
              .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+    var bg = plt.append("rect")
+            .attr("width", w)
+            .attr("height", h)
+            .attr("fill", "azure");
 
     var x = d3.scaleTime()
                   .domain(d3.extent(d, d => d.date))
@@ -128,21 +132,23 @@ h1 a{
                 .x(d => x(d.date))
                 .y(d => y2(d.humidity))
 
-    plt.append("g")
+    y1axis = d3.axisLeft(y1);
+    var gy1 = plt.append("g")
         .attr("class", "axis")
-        .call(d3.axisLeft(y1));
-    plt.append("g")
+        .call(y1axis);
+    y2axis = d3.axisRight(y2);
+    var gy2 = plt.append("g")
         .attr("class", "axis")
-        .call(d3.axisRight(y2))
+        .call(y2axis)
         .attr("transform", "translate("+ w + ",0)");
-    plt.append("g")
+    xaxis = d3.axisBottom(x);
+    var gx = plt.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(0," + h + ")")
-        .call(d3.axisBottom(x));
-        //.attr("transform", "translate(0," + y1(0) + ")");
+        .call(xaxis);
 
     // Add lines.
-    datalines = plt.append("svg:g");
+    datalines = plt.append("svg:g")
     datalines.append("path")
           .datum(d)
           .attr("d", lineTemp(d))
@@ -155,6 +161,23 @@ h1 a{
           .attr("stroke", "blue")
           .attr("stroke-width", 1.5)
           .attr("fill", "none");
+
+    plt.call(d3.zoom()
+               .scaleExtent([1,10])
+               .translateExtent([[m[3],m[0]],[w+m[3],h+m[0]]])
+               .extent([ [m[3],m[0]], [w+m[3],h+m[0]] ])
+               .on("zoom", zoomed)
+            )
+
+    function zoomed(){
+      var t = d3.event.transform;
+      datalines.attr("transform", t);
+      gx.call(xaxis.scale(t.rescaleX(x)))
+      gy1.call(y1axis.scale(t.rescaleY(y1)))
+      gy2.call(y2axis.scale(t.rescaleY(y2)))
+      console.log("zoom")
+      console.log(t)
+    }
   }
 
 
