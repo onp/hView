@@ -31,6 +31,7 @@ h1 a{
 <div id=content>
   <p>Waiting for data...</p>
 </div>
+<button>back</button>
 <label>Date</label><input type="date" id="startDate"></input>
 
 
@@ -67,15 +68,20 @@ h1 a{
     w = window.innerWidth - m[1] - m[3],
     h = window.innerHeight - m[0] - m[2] - topOfContent;
 
-  //get temp data for current day
-  var doc = db.collection("tempDaily").doc(todayStr);
-  doc.get().then(function(qs) {
-    console.log(qs)
-    var d1 = qs.data()
-
-    makePlot(d1.data)
-
+  d3.select("#startDate").on("change", function(){
+    changeDay(this.value)
   })
+
+  changeDay(todayStr);
+
+  //get temp data for current day
+  function changeDay(day){
+    var doc = db.collection("tempDaily").doc(day);
+    doc.get().then(function(qs) {
+      console.log(qs)
+      makePlot(qs.data().data)
+    })
+  }
 
   function makePlot(data){
     var d = d3.csvParse("date,temp,humidity\n" + data,
@@ -101,12 +107,14 @@ h1 a{
                   .domain(d3.extent(d, d => d.date))
                   .range([0, w]);
 
+    var y1extent = d3.extent(d, d => d.temp)
     var y1 = d3.scaleLinear()
-                  .domain(d3.extent(d, d => d.temp))
+                  .domain([d3.min([14,y1extent[0]]),d3.max([24,y1extent[1]])])
                   .range([h, 0]);
 
+    var y2extent = d3.extent(d, d => d.humidity)
     var y2 = d3.scaleLinear()
-                  .domain(d3.extent(d, d => d.humidity))
+                  .domain([d3.min([25,y2extent[0]]),d3.max([45,y2extent[1]])])
                   .range([h, 0]);
 
     console.log(x.domain())
