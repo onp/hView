@@ -105,12 +105,12 @@ h1 a{
         }
         return d
       } else if ( i == a.length-1) {
-        if (d.humidity < (a[-2].humidity-5)) {
-          d.humidity = a[-2].humidity
+        if (d.humidity < (a[i-1].humidity-5)) {
+          d.humidity = a[i-1].humidity
           d.humidityCorrected = true
         }
-        if (d.temp < (a[-2].temp-5)) {
-          d.temp = a[-2].temp
+        if (d.temp < (a[i-1].temp-5)) {
+          d.temp = a[i-1].temp
           d.tempCorrected = true
         }
         return d
@@ -125,6 +125,7 @@ h1 a{
           d.temp = tInterp
           d.tempCorrected = true
         }
+        return d
       }
     })
 
