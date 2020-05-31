@@ -232,7 +232,7 @@ h1 a{
 
     function zoomed(){
       var t = d3.event.transform;
-      datalines.attr("transform", t);
+      dataLayer.attr("transform", t);
       gx.call(xaxis.scale(t.rescaleX(x)))
       gy1.call(y1axis.scale(t.rescaleY(y1)))
       gy2.call(y2axis.scale(t.rescaleY(y2)))
