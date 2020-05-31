@@ -117,11 +117,11 @@ h1 a{
       } else {
         hInterp = (a[i-1].humidity + a[i+1].humidity)/2
         tInterp = (a[i-1].temp + a[i+1].temp)/2
-        if (d.humidity < (hInterp-5)) {
+        if (d.humidity < (hInterp-3)) {
           d.humidity = hInterp
           d.humidityCorrected = true
         }
-        if (d.temp < (tInterp-5)) {
+        if (d.temp < (tInterp-1.5)) {
           d.temp = tInterp
           d.tempCorrected = true
         }
@@ -198,6 +198,28 @@ h1 a{
           .attr("stroke", "blue")
           .attr("stroke-width", 1.5)
           .attr("fill", "none");
+
+    // Add data cleaning circles.
+    tCircles = plt.append("svg:g")
+    // humidity
+    tCircles.selectAll("circle")
+      .data(d.filter(d => d.tempCorrected))
+      .enter().append("circle")
+        .attr("cx", d => x(d.date))
+        .attr("cy", d => y1(d.temp))
+        .attr("r", 2.5)
+        .attr("stroke", "red")
+
+    hCircles = plt.append("svg:g")
+    // humidity
+    hCircles.selectAll("circle")
+      .data(d.filter(d => d.humidityCorrected))
+      .enter().append("circle")
+        .attr("cx", d => x(d.date))
+        .attr("cy", d => y2(d.humidity))
+        .attr("r", 2.5)
+        .attr("stroke", "blue")
+
 
     plt.call(d3.zoom()
                .scaleExtent([1,10])
