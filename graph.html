@@ -185,14 +185,14 @@ h1 a{
         .call(xaxis);
 
     // Add lines.
-    datalines = plt.append("svg:g")
-    datalines.append("path")
+    dataLayer = plt.append("svg:g")
+    dataLayer.append("path")
           .datum(d)
           .attr("d", lineTemp(d))
           .attr("stroke", "red")
           .attr("stroke-width", 1.5)
           .attr("fill", "none");
-    datalines.append("path")
+    dataLayer.append("path")
           .datum(d)
           .attr("d", lineHum(d))
           .attr("stroke", "blue")
@@ -200,25 +200,27 @@ h1 a{
           .attr("fill", "none");
 
     // Add data cleaning circles.
-    tCircles = plt.append("svg:g")
+    tCircles = dataLayer.append("svg:g")
     // humidity
     tCircles.selectAll("circle")
       .data(d.filter(d => d.tempCorrected))
       .enter().append("circle")
         .attr("cx", d => x(d.date))
         .attr("cy", d => y1(d.temp))
-        .attr("r", 2.5)
+        .attr("r", 4)
         .attr("stroke", "red")
+        .attr("fill", "none")
 
-    hCircles = plt.append("svg:g")
+    hCircles = dataLayer.append("svg:g")
     // humidity
     hCircles.selectAll("circle")
       .data(d.filter(d => d.humidityCorrected))
       .enter().append("circle")
         .attr("cx", d => x(d.date))
         .attr("cy", d => y2(d.humidity))
-        .attr("r", 2.5)
+        .attr("r", 4)
         .attr("stroke", "blue")
+        .attr("fill", "none")
 
 
     plt.call(d3.zoom()
