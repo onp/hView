@@ -1,0 +1,223 @@
+<!doctype html>
+
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Is it cold?">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hView</title>
+
+  <style>
+
+body {
+width: 100%;
+overflow-x: hidden;
+position: relative;
+
+}
+
+h1 a{
+  color:black;
+  text-decoration: none;
+}
+
+  </style>
+
+</head>
+
+<body>
+<h1><a href="/">hView</a></h1>
+<div id=content>
+  <p>Waiting for data...</p>
+</div>
+<button>back</button>
+<label>Date</label><input type="date" id="startDate"></input>
+
+
+<script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+<script src="lib/d3.js"></script>
+<script>
+  // Initialize Firebase
+  firebase.initializeApp({
+    apiKey: "AIzaSyCch8gDaGfQhOFVroFCZHKosa3oOU-WvPE",
+    authDomain: "templogger-233703.firebaseapp.com",
+    projectId: "templogger-233703",
+  });
+  var db = firebase.firestore();
+</script>
+
+<script>
+
+  function pad(num){
+    return num.toString().padStart(2,0)
+  }
+
+  //ref for date input
+  var dt = document.querySelector('#startDate')
+
+  var today = new Date()
+  var todayStr = today.getFullYear() + '-' + pad(today.getMonth()+1) + "-" + pad(today.getDate())
+
+  dt.value = todayStr
+
+  topOfContent = d3.select("#content").node().offsetTop
+  // setup margins for plot area      t, r, b, l
+  var m = [10, 80, 80, 80],
+    w = window.innerWidth - m[1] - m[3],
+    h = window.innerHeight - m[0] - m[2] - topOfContent;
+
+  d3.select("#startDate").on("change", function(){
+    changeDay(this.value)
+  })
+
+  changeDay(todayStr);
+
+  //get temp data for current day
+  function changeDay(day){
+    var doc = db.collection("tempDaily").doc(day);
+    doc.get().then(function(qs) {
+      console.log(qs)
+      makePlot(qs.data().data)
+    })
+  }
+
+  function makePlot(data){
+    var d = d3.csvParse("date,temp,humidity\n" + data,
+                      function(d){
+                        return {date: new Date(d.date.slice(1,-1)),
+                                humidity: +d.humidity,
+                                temp: +d.temp
+                               }
+                      })
+    d = d.filter(d => !isNaN(d.humidity))
+
+    d = d.map(function(d,i,a){
+      if (i == 0){
+        if (d.humidity < (a[1].humidity-5)) {
+          d.humidity = a[1].humidity
+          d.humidityCorrected = true
+        }
+        if (d.temp < (a[1].temp-5)) {
+          d.temp = a[1].temp
+          d.tempCorrected = true
+        }
+        return d
+      } elseif ( i == a.length-1){
+        if (d.humidity < (a[-2].humidity-5)) {
+          d.humidity = a[-2].humidity
+          d.humidityCorrected = true
+        }
+        if (d.temp < (a[-2].temp-5)) {
+          d.temp = a[-2].temp
+          d.tempCorrected = true
+        }
+        return d
+      } else {
+        hInterp = (a[i-1].humidity + a[i+1].humidity)/2
+        tInterp = (a[i-1].temp + a[i+1].temp)/2
+        if (d.humidity < (hInterp-5)) {
+          d.humidity = hInterp
+          d.humidityCorrected = true
+        }
+        if (d.temp < (tInterp-5)) {
+          d.temp = tInterp
+          d.tempCorrected = true
+        }
+      }
+    })
+
+    console.log(d)
+
+    var svg = d3.select("#content").text("").append("svg")
+
+    svg.attr("width", w + m[1] + m[3] - 1)
+       .attr("height", h + m[0] + m[2])
+
+    var plt = svg.append("g")
+             .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+    var bg = plt.append("rect")
+            .attr("width", w)
+            .attr("height", h)
+            .attr("fill", "azure");
+
+    var x = d3.scaleTime()
+                  .domain(d3.extent(d, d => d.date))
+                  .range([0, w]);
+
+    var y1extent = d3.extent(d, d => d.temp)
+    var y1 = d3.scaleLinear()
+                  .domain([d3.min([14,y1extent[0]]),d3.max([24,y1extent[1]])])
+                  .range([h, 0]);
+
+    var y2extent = d3.extent(d, d => d.humidity)
+    var y2 = d3.scaleLinear()
+                  .domain([d3.min([25,y2extent[0]]),d3.max([45,y2extent[1]])])
+                  .range([h, 0]);
+
+    console.log(x.domain())
+    console.log(y1.domain())
+
+    var lineTemp = d3.line()
+                .x(d => x(d.date))
+                .y(d => y1(d.temp))
+
+    var lineHum = d3.line()
+                .x(d => x(d.date))
+                .y(d => y2(d.humidity))
+
+    y1axis = d3.axisLeft(y1);
+    var gy1 = plt.append("g")
+        .attr("class", "axis")
+        .call(y1axis);
+    y2axis = d3.axisRight(y2);
+    var gy2 = plt.append("g")
+        .attr("class", "axis")
+        .call(y2axis)
+        .attr("transform", "translate("+ w + ",0)");
+    xaxis = d3.axisBottom(x);
+    var gx = plt.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + h + ")")
+        .call(xaxis);
+
+    // Add lines.
+    datalines = plt.append("svg:g")
+    datalines.append("path")
+          .datum(d)
+          .attr("d", lineTemp(d))
+          .attr("stroke", "red")
+          .attr("stroke-width", 1.5)
+          .attr("fill", "none");
+    datalines.append("path")
+          .datum(d)
+          .attr("d", lineHum(d))
+          .attr("stroke", "blue")
+          .attr("stroke-width", 1.5)
+          .attr("fill", "none");
+
+    plt.call(d3.zoom()
+               .scaleExtent([1,10])
+               .translateExtent([[m[3],m[0]],[w+m[3],h+m[0]]])
+               .extent([ [m[3],m[0]], [w+m[3],h+m[0]] ])
+               .on("zoom", zoomed)
+            )
+
+    function zoomed(){
+      var t = d3.event.transform;
+      datalines.attr("transform", t);
+      gx.call(xaxis.scale(t.rescaleX(x)))
+      gy1.call(y1axis.scale(t.rescaleY(y1)))
+      gy2.call(y2axis.scale(t.rescaleY(y2)))
+      console.log("zoom")
+      console.log(t)
+    }
+  }
+
+
+</script>
+
+</body>
+</html>
